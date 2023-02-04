@@ -4,20 +4,22 @@ const Cors = require("cors");
 const Mongoose = require("mongoose");
 const EmployeeModel = require("./modles/Employee");
 
-
 const app = new Express();
 app.use(Bodyparser.json());
 app.use(Bodyparser.urlencoded({ extended: true }))
 app.use(Cors());
 
+const path = require('path');
+app.use(Express.static(path.join(__dirname,'/build')));
+console.log(path.join(__dirname,'/build'))
+
+
 Mongoose.connect("mongodb+srv://jisha:jisha@cluster0.a2wdl3u.mongodb.net/employeeDB?retryWrites=true&w=majority", { useNewUrlParser: true })
 
-const path = require('path');
-app.use(Express.static(path.join(_dirname,'/build')));
 
 
 //Sign in
-app.post("/signin", async (req, res) => {
+app.post("/api/signin", async (req, res) => {
     console.log(req.body.emailid, req.body.password)
     EmployeeModel.find(
         {
@@ -36,7 +38,7 @@ app.post("/signin", async (req, res) => {
 })
 
 //Add Employee
-app.post('/addemployee', async (req, res) => {
+app.post('/api/addemployee', async (req, res) => {
     const newEmployee = new EmployeeModel(req.body)
     console.log(req.body)
     await newEmployee.save((error, data) => {
@@ -50,7 +52,7 @@ app.post('/addemployee', async (req, res) => {
 })
 
 //View Employee List
-app.get("/viewemployee", async (req, res) => {
+app.get("/api/viewemployee", async (req, res) => {
     try {
         var result = await EmployeeModel.find();
         res.send(result);
@@ -60,7 +62,7 @@ app.get("/viewemployee", async (req, res) => {
 })
 
 //get employee by id
-app.post("/getemployee", async (req, res) => {
+app.post("/api/getemployee", async (req, res) => {
     var data = req.body
     console.log(data)
     console.log(req.params.id)
@@ -74,7 +76,7 @@ app.post("/getemployee", async (req, res) => {
 })
 
 //update employee
-app.put('/updateEmployee', async (req, res) => {
+app.put('/api/updateEmployee', async (req, res) => {
     let data = req.body
     console.log(data.name, data.emailid, data.location, data.designation, data.salary)
 
@@ -101,7 +103,7 @@ app.put('/updateEmployee', async (req, res) => {
 })
 
 //delete Employee
-app.delete('/deleteEmployee/:id', (req, res) => {
+app.delete('/api/deleteEmployee/:id', (req, res) => {
     var data = req.params.id;
     console.log(req.params.id)
     // console.log(data)
@@ -119,9 +121,9 @@ app.delete('/deleteEmployee/:id', (req, res) => {
 })
 
 app.get('/*', function(req,res){
-    res.sendfile(path.join(_dirname,'/build/index.html'))
+    res.sendfile(path.join(__dirname,'/build/index.html'))
 })
 
-app.listen(3001, () => {
+app.listen(8001, () => {
     console.log("server started")
 })
